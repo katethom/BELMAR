@@ -4,37 +4,44 @@ USE BELMAR
 
 -- create lookup tables
 
+if object_id(N'dbo.account_lookup', N'U') is null
 create table account_lookup(
 id  nvarchar(18), 
 sourceid  nvarchar(255)
 )
 
 
-drop table if exists account_load
+drop table if exists account_pre_load
 
 select 
-cast(id as nvarchar(18)) as id
-,sourceid
-,name
-,createddate
-,active__c
-,billingstreet
-,phone
-into account_load from account_mapped where sourceid not in (select sourceid from account_lookup where id is not null)
-
+cast(l.id as nvarchar(18)) as id
+,m.sourceid
+,m.name
+,m.createddate
+,m.active__c
+,m.billingaddress
+,m.phone
+into account_pre_load from account_mapped m left join account_lookup l on m.sourceid = l.sourceid
 
 -- LOAD
-select * from account_load_result where sourceid = 
+
+drop table if exists account_load
  
+select * into account_load from account_pre_load where id is null
+
 exec SF_TableLoader 'insert', 'BELMAR', 'Account_load'
 
 insert into account_lookup select id, sourceid from account_load_result where error = 'Operation Successful.' and id is not null
  
-select * from account_lookup
+select count(sourceid) as'count of records', error from Account_load_Result group by error
 
---update account with billing street
+--update account 
 
-select l.id, a.billingaddress as billingstreet into account_update from account_insert a left join account_lookup l on a.sourceid = l.sourceid
+drop table if exists account_update
+
+select * into account_update from account_load where id is not null
 
 exec SF_TableLoader 'update', 'BELMAR', 'Account_update'
+
+select count(sourceid) as 'count of records', error from Account_update_Result group by error
 

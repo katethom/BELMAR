@@ -35,7 +35,7 @@ insert into account_lookup select id, sourceid from account_load_result where er
  
 select count(sourceid) as'count of records', error from Account_load_Result group by error
 
---update account 
+-- UPDATE
 
 drop table if exists account_update
 

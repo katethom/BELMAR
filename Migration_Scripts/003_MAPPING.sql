@@ -41,4 +41,3 @@ id
 into contact_mapped
 from individual_clients
 
---s20902 owner would like to offer one year lease

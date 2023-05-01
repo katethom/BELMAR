@@ -2,6 +2,7 @@
 
 USE BELMAR
 
+--create table
 drop table if exists dbo.clients
 
 CREATE TABLE clients
@@ -25,7 +26,7 @@ WITH
 )
 GO
 
-
+--create table
 drop table if exists dbo.contactdetails
 
 CREATE TABLE contactdetails
